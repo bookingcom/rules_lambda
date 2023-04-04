@@ -1,0 +1,14 @@
+load("@gazelle//:def.bzl", "gazelle")
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+
+# gazelle:prefix main
+gazelle(name = "gazelle")
+
+buildifier(
+    name = "buildifier",
+    exclude_patterns = [
+        "./.git/*",
+        "./bazel-*",
+    ],
+    mode = "fix",
+)

@@ -10,9 +10,6 @@ go_deps.from_file(
     go_mod = "go.mod",
 )
 
-use_repo(
-    go_deps,
-)
-
 bazel_dep(name = "buildifier_prebuilt", version = "6.0.0.1")
 bazel_dep(name = "rules_pkg", version = "0.9.0")
+bazel_dep(name = "bazel_skylib", version = "1.4.1")
