@@ -59,7 +59,6 @@ func main() {
 		}
 
 		if hdr.Typeflag != tar.TypeReg {
-			stderr.Printf("Skipping %s\n", hdr.Name)
 			continue
 		}
 
@@ -73,8 +72,6 @@ func main() {
 		if *compress {
 			fih.Method = zip.Deflate
 		}
-
-		stderr.Printf("Reading: %s\n", hdr.Name)
 
 		f, err := writer.CreateHeader(fih)
 		if err != nil {
@@ -114,12 +111,10 @@ func main() {
 		stderr.Fatalf("Failed to close reader: %s", err)
 		os.Exit(1)
 	}
-	stderr.Printf("Zip file has %d bytes\n", len(outBuf.Bytes()))
 
-	r, err := oFile.Write(outBuf.Bytes())
+	_, err = oFile.Write(outBuf.Bytes())
 	if err != nil {
 		stderr.Fatalf("Failed to write to output: %s", err)
 		os.Exit(1)
 	}
-	stderr.Printf("Wrote %d bytes to %s\n", r, *output)
 }

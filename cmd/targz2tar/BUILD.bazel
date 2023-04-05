@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "targz2tar_lib",
+    srcs = ["targz2tar.go"],
+    importpath = "main/cmd/targz2tar",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "targz2tar",
+    embed = [":targz2tar_lib"],
+    visibility = ["//visibility:public"],
+)

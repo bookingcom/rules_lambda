@@ -1,18 +1,15 @@
-def _tar2zip_impl(ctx):
-    output = ctx.label.name + ".zip"
+def _targz2tar_impl(ctx):
+    output = ctx.label.name + ".tar"
     output_file = ctx.actions.declare_file(output)
 
     args = ctx.actions.args()
     args.add("-output", output_file.path)
     args.add("-input", ctx.file.input.path)
 
-    if ctx.attr.compress:
-        args.add('-compress')
-
     ctx.actions.run(
-        mnemonic = "Tar2Zip",
+        mnemonic = "TarGz2Tar",
         inputs = [ctx.file.input],
-        executable = ctx.executable._tar2zip_binary,
+        executable = ctx.executable._targz2tar_binary,
         arguments = [ args ],
         outputs = [output_file],
         use_default_shell_env = True,
@@ -24,25 +21,20 @@ def _tar2zip_impl(ctx):
         )
     ]
 
-
-_tar2zip_attr = {
+_targz2tar_attrs = {
     "input": attr.label(
         doc = "Input file",
         mandatory = True,
-        allow_single_file = True
+        allow_single_file=True,
     ),
-    "compress": attr.bool(
-        doc = "Enable ZIP compression, this has an impact in performance",
-        default = False
-    ),
-    "_tar2zip_binary": attr.label(
-        default = "@//cmd/tar2zip",
+    "_targz2tar_binary": attr.label(
+        default = "@//cmd/targz2tar",
         executable = True,
         cfg = "host"
     ),
 }
 
-tar2zip = rule(
-    implementation = _tar2zip_impl,
-    attrs = _tar2zip_attr,
+targz2tar = rule(
+    implementation = _targz2tar_impl,
+    attrs = _targz2tar_attrs
 )
