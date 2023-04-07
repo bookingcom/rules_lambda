@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -16,12 +17,13 @@ import (
 )
 
 var (
-	functionName = flag.String("function-name", "", "function name to update")
-	region       = flag.String("region", "", "aws region to use")
-	architecture = flag.String("architecture", "x86_64", "CPU architecture")
-	dryRun       = flag.Bool("dry-run", false, "validate without applying change")
-	publish      = flag.Bool("publish", false, "publish a new version of the function after updating")
-	zipFile      = flag.String("zip-file", "", "zip file containing the function code")
+	functionArn        = flag.String("function-arn", "", "function arn to update")
+	functionNamePrefix = flag.String("function-name-prefix", "", "function name prefix to update")
+	region             = flag.String("region", "", "aws region to use")
+	architecture       = flag.String("architecture", "x86_64", "CPU architecture")
+	dryRun             = flag.Bool("dry-run", false, "validate without applying change")
+	publish            = flag.Bool("publish", false, "publish a new version of the function after updating")
+	zipFile            = flag.String("zip-file", "", "zip file containing the function code")
 
 	logger     = log.New(os.Stderr, "update-function-code", log.LstdFlags)
 )
@@ -34,7 +36,7 @@ func getArchitecture() []types.Architecture {
 	} else if *architecture == "arm64" {
 		out[0] = types.ArchitectureArm64
 	} else {
-		logger.Fatal("Invalid architecture %s", *architecture)
+		logger.Fatalf("Invalid architecture %s", *architecture)
 		os.Exit(1)
 	}
 	return out
@@ -73,11 +75,47 @@ func getEncodedZipFile() (*bytes.Buffer, error) {
 	return zipBuffer, nil
 }
 
+func getFunctionArn(ctx context.Context, client *lambda.Client) (string, error) {
+	if len(*functionArn) > 0 {
+		return *functionArn, nil
+	}
+
+	maxItems := new(int32)
+	*maxItems = 50
+
+	params := &lambda.ListFunctionsInput{
+		MaxItems: maxItems,
+	}
+	for {
+		res, err := client.ListFunctions(ctx, params)
+		if err != nil {
+			return "", err
+		}
+		for _, f := range(res.Functions) {
+			if strings.Index(*f.FunctionName, *functionNamePrefix) == 0 {
+				logger.Printf("Found match %s -> %s", *f.FunctionName, *f.FunctionArn)
+				return *f.FunctionArn, nil
+			}
+
+		}
+		if res.NextMarker == nil || len(*res.NextMarker) == 0 {
+			return "", nil
+		}
+		params.Marker = res.NextMarker
+	}
+
+}
+
 func main() {
 	flag.Parse()
 
-	if len(*functionName) == 0 {
-		logger.Fatal("-function-name missing")
+	if len(*functionArn) == 0 && len(*functionNamePrefix) == 0{
+		logger.Fatal("one of -function-arn or -function-name-prefix needs to be passed")
+		os.Exit(1)
+	}
+
+	if len(*functionArn) > 0 && len(*functionNamePrefix) > 0{
+		logger.Fatal("only one of -function-arn or -function-name-prefix can be passed")
 		os.Exit(1)
 	}
 
@@ -102,8 +140,20 @@ func main() {
 
 	cli := lambda.NewFromConfig(cfg)
 
+	arn, err := getFunctionArn(ctx, cli)
+
+	if err != nil {
+		logger.Fatalf("Failed to resolve lambda name: %s", err.Error())
+		os.Exit(1)
+	}
+
+	if len(arn) == 0 {
+		logger.Fatalf("Failed to find a lambda with prefix %s", *functionNamePrefix)
+		os.Exit(1)
+	}
+
 	getFunctionParams := &lambda.GetFunctionInput {
-		FunctionName: aws.String(*functionName),
+		FunctionName: aws.String(arn),
 	}
 	_, err = cli.GetFunction(ctx, getFunctionParams) // verify we can retrieve the function details
 
@@ -120,7 +170,7 @@ func main() {
 	}
 
 	updateParams := &lambda.UpdateFunctionCodeInput{
-		FunctionName: aws.String(*functionName),
+		FunctionName: aws.String(arn),
 		Architectures: getArchitecture(),
 		DryRun: *dryRun,
 		Publish: *publish,

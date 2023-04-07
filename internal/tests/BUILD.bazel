@@ -1,5 +1,6 @@
 load("@//internal:targz2tar.bzl", "targz2tar")
 load("@//internal:tar2zip.bzl", "tar2zip")
+load("@//internal:lambda.bzl", "update_function_code")
 
 targz2tar(
     name = "test_tar",
@@ -22,4 +23,12 @@ sh_test(
         ":test_tar",
         ":test_zip",
     ],
+)
+
+update_function_code(
+    name = "update-lambda",
+    function_name = "some_lambda",
+    region = "eu-central-1",
+    zip_file = ":test_zip",
+    dry_run = True
 )
