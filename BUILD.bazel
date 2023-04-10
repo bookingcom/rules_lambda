@@ -1,14 +1,11 @@
-load("@gazelle//:def.bzl", "gazelle")
-load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 
-# gazelle:prefix main
-gazelle(name = "gazelle")
+gazelle_binary(
+    name = "gazelle_bin",
+    languages = ["@bazel_skylib_gazelle_plugin//bzl"],
+)
 
-buildifier(
-    name = "buildifier",
-    exclude_patterns = [
-        "./.git/*",
-        "./bazel-*",
-    ],
-    mode = "fix",
+gazelle(
+    name = "gazelle",
+    gazelle = "gazelle_bin",
 )
