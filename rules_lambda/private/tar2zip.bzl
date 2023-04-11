@@ -7,7 +7,7 @@ def _tar2zip_impl(ctx):
     args.add("-input", ctx.file.input.path)
 
     if ctx.attr.compress:
-        args.add("-compress")
+        args.add("-enable-compression")
 
     ctx.actions.run(
         mnemonic = "Tar2Zip",

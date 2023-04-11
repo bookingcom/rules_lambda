@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"flag"
 	"io"
 	"log"
@@ -25,7 +24,7 @@ var (
 	publish            = flag.Bool("publish", false, "publish a new version of the function after updating")
 	zipFile            = flag.String("zip-file", "", "zip file containing the function code")
 
-	logger     = log.New(os.Stderr, "update-function-code", log.LstdFlags)
+	logger = log.New(os.Stderr, "update-function-code", log.LstdFlags)
 )
 
 func getArchitecture() []types.Architecture {
@@ -52,18 +51,14 @@ func getEncodedZipFile() (*bytes.Buffer, error) {
 
 	defer reader.Close()
 
-	zipBuffer := new(bytes.Buffer)
-
-	encoder := base64.NewEncoder(base64.StdEncoding, zipBuffer)
-
-	defer encoder.Close()
+	out := new(bytes.Buffer)
 
 	ibuf := make([]byte, 4096)
 
 	for {
 		n, err := reader.Read(ibuf)
 		if n > 0 {
-			encoder.Write(ibuf[:n])
+			out.Write(ibuf[:n])
 			continue
 		}
 		if err == io.EOF {
@@ -72,7 +67,7 @@ func getEncodedZipFile() (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	return zipBuffer, nil
+	return out, nil
 }
 
 func getFunctionArn(ctx context.Context, client *lambda.Client) (string, error) {
@@ -91,7 +86,7 @@ func getFunctionArn(ctx context.Context, client *lambda.Client) (string, error) 
 		if err != nil {
 			return "", err
 		}
-		for _, f := range(res.Functions) {
+		for _, f := range res.Functions {
 			if strings.Index(*f.FunctionName, *functionNamePrefix) == 0 {
 				logger.Printf("Found match %s -> %s", *f.FunctionName, *f.FunctionArn)
 				return *f.FunctionArn, nil
@@ -109,12 +104,12 @@ func getFunctionArn(ctx context.Context, client *lambda.Client) (string, error) 
 func main() {
 	flag.Parse()
 
-	if len(*functionArn) == 0 && len(*functionNamePrefix) == 0{
+	if len(*functionArn) == 0 && len(*functionNamePrefix) == 0 {
 		logger.Fatal("one of -function-arn or -function-name-prefix needs to be passed")
 		os.Exit(1)
 	}
 
-	if len(*functionArn) > 0 && len(*functionNamePrefix) > 0{
+	if len(*functionArn) > 0 && len(*functionNamePrefix) > 0 {
 		logger.Fatal("only one of -function-arn or -function-name-prefix can be passed")
 		os.Exit(1)
 	}
@@ -152,7 +147,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	getFunctionParams := &lambda.GetFunctionInput {
+	getFunctionParams := &lambda.GetFunctionInput{
 		FunctionName: aws.String(arn),
 	}
 	_, err = cli.GetFunction(ctx, getFunctionParams) // verify we can retrieve the function details
@@ -170,11 +165,11 @@ func main() {
 	}
 
 	updateParams := &lambda.UpdateFunctionCodeInput{
-		FunctionName: aws.String(arn),
+		FunctionName:  aws.String(arn),
 		Architectures: getArchitecture(),
-		DryRun: *dryRun,
-		Publish: *publish,
-		ZipFile: zipBuffer.Bytes(),
+		DryRun:        *dryRun,
+		Publish:       *publish,
+		ZipFile:       zipBuffer.Bytes(),
 	}
 
 	_, err = cli.UpdateFunctionCode(ctx, updateParams)
