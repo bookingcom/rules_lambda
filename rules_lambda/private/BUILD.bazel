@@ -1,1 +1,21 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
 exports_files(["lambda_update_wrapper.sh"])
+
+bzl_library(
+    name = "lambda",
+    srcs = ["lambda.bzl"],
+    visibility = ["//rules_lambda:__subpackages__"],
+)
+
+bzl_library(
+    name = "tar2zip",
+    srcs = ["tar2zip.bzl"],
+    visibility = ["//rules_lambda:__subpackages__"],
+)
+
+bzl_library(
+    name = "targz2tar",
+    srcs = ["targz2tar.bzl"],
+    visibility = ["//rules_lambda:__subpackages__"],
+)

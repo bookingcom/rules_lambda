@@ -22,9 +22,9 @@ def _update_function_code_impl(ctx):
         output = output_file,
         substitutions = {
             "${args}": " ".join(args),
-            "${update_function_code}": ctx.executable._update_function_code.short_path
+            "${update_function_code}": ctx.executable._update_function_code.short_path,
         },
-        is_executable = True
+        is_executable = True,
     )
     return [
         DefaultInfo(
@@ -32,12 +32,11 @@ def _update_function_code_impl(ctx):
             runfiles = ctx.runfiles(
                 files = [
                     ctx.executable._update_function_code,
-                    ctx.file.zip_file
-                ]
-            )
-        )
+                    ctx.file.zip_file,
+                ],
+            ),
+        ),
     ]
-
 
 _update_function_code_attr = {
     "function_name": attr.string(
@@ -55,25 +54,25 @@ _update_function_code_attr = {
     "zip_file": attr.label(
         doc = "The zip file containing the code",
         mandatory = True,
-        allow_single_file = True
+        allow_single_file = True,
     ),
     "publish": attr.bool(
         doc = "Publish new version right away",
-        default = False
+        default = False,
     ),
     "dry_run": attr.bool(
         doc = "Dry-run and not apply the change",
-        default = False
+        default = False,
     ),
     "_update_function_code": attr.label(
-        default = "@//cmd/update-function-code",
+        default = "@//rules_lambda/private/cmd/update-function-code",
         executable = True,
-        cfg = "host"
+        cfg = "host",
     ),
     "_lambda_update_wrapper": attr.label(
-        default = "@//internal:lambda_update_wrapper.sh",
-        allow_single_file = True
-    )
+        default = "@//rules_lambda/private:lambda_update_wrapper.sh",
+        allow_single_file = True,
+    ),
 }
 
 update_function_code = rule(

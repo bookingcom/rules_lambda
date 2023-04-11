@@ -1,4 +1,14 @@
-load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+
+buildifier(
+    name = "buildifier",
+    exclude_patterns = [
+        "./.git/*",
+        "./bazel-*",
+    ],
+    mode = "fix",
+)
 
 gazelle_binary(
     name = "gazelle_bin",
