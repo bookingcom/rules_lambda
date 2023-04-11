@@ -8,7 +8,8 @@ bzl_library(
     srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "@//internal:lambda",
-        "@//internal:tar2zip",
+        "//rules_lambda/private:lambda",
+        "//rules_lambda/private:tar2zip",
+        "//rules_lambda/private:targz2tar",
     ],
 )

@@ -35,7 +35,7 @@ _tar2zip_attr = {
         default = False,
     ),
     "_tar2zip_binary": attr.label(
-        default = "@//rules_lambda/private/cmd/tar2zip",
+        default = "//rules_lambda/private/cmd/tar2zip",
         executable = True,
         cfg = "host",
     ),

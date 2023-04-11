@@ -1,1 +1,9 @@
 # empty placeholder
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_file(
+    name = "test_tar_gz",
+    sha256 = "45768f4266fa6b2979213ad75085155b3b63fae89977b7d66e8736044a3c0a50",
+    url = "https://github.com/bazelbuild/bazel-gazelle/archive/4dfcb75883c6ca2441e6ad17173488068adcfb1c.tar.gz",
+)
