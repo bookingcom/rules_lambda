@@ -10,31 +10,31 @@ def _targz2tar_impl(ctx):
         mnemonic = "TarGz2Tar",
         inputs = [ctx.file.input],
         executable = ctx.executable._targz2tar_binary,
-        arguments = [ args ],
+        arguments = [args],
         outputs = [output_file],
         use_default_shell_env = True,
     )
 
     return [
         DefaultInfo(
-            files = depset([output_file])
-        )
+            files = depset([output_file]),
+        ),
     ]
 
 _targz2tar_attrs = {
     "input": attr.label(
         doc = "Input file",
         mandatory = True,
-        allow_single_file=True,
+        allow_single_file = True,
     ),
     "_targz2tar_binary": attr.label(
-        default = "@//cmd/targz2tar",
+        default = "@//rules_lambda/private/cmd/targz2tar",
         executable = True,
-        cfg = "host"
+        cfg = "host",
     ),
 }
 
 targz2tar = rule(
     implementation = _targz2tar_impl,
-    attrs = _targz2tar_attrs
+    attrs = _targz2tar_attrs,
 )

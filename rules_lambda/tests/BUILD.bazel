@@ -1,3 +1,33 @@
-load(":versions_test.bzl", "versions_test_suite")
+load("//rules_lambda:defs.bzl", "tar2zip", "update_function_code")
+load("@//rules_lambda/private:targz2tar.bzl", "targz2tar")
 
-versions_test_suite(name = "versions_test")
+targz2tar(
+    name = "test_tar",
+    input = "@test_tar_gz//file",
+)
+
+tar2zip(
+    name = "test_zip",
+    compress = False,
+    input = ":test_tar",
+)
+
+sh_test(
+    name = "can_convert_from_targz_to_zip",
+    size = "small",
+    srcs = [
+        "can_convert_from_targz_to_zip.sh",
+    ],
+    data = [
+        ":test_tar",
+        ":test_zip",
+    ],
+)
+
+update_function_code(
+    name = "update-lambda",
+    dry_run = True,
+    function_name = "some_lambda",
+    region = "eu-central-1",
+    zip_file = ":test_zip",
+)
