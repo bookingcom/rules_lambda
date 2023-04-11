@@ -28,7 +28,7 @@ _targz2tar_attrs = {
         allow_single_file = True,
     ),
     "_targz2tar_binary": attr.label(
-        default = "@//rules_lambda/private/cmd/targz2tar",
+        default = "//rules_lambda/private/cmd/targz2tar",
         executable = True,
         cfg = "host",
     ),

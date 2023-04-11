@@ -65,12 +65,12 @@ _update_function_code_attr = {
         default = False,
     ),
     "_update_function_code": attr.label(
-        default = "@//rules_lambda/private/cmd/update-function-code",
+        default = "//rules_lambda/private/cmd/update-function-code",
         executable = True,
         cfg = "host",
     ),
     "_lambda_update_wrapper": attr.label(
-        default = "@//rules_lambda/private:lambda_update_wrapper.sh",
+        default = "//rules_lambda/private:lambda_update_wrapper.sh",
         allow_single_file = True,
     ),
 }
