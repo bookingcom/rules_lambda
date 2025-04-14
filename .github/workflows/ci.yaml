@@ -17,7 +17,11 @@ concurrency:
 
 jobs:
   test:
-    uses: bazel-contrib/.github/.github/workflows/bazel.yaml@v2
+    uses: bazel-contrib/.github/.github/workflows/bazel.yaml@v7.2.0
     with:
       folders: '[".", "e2e/smoke"]'
-
+      exclude: |
+        [
+          {"folder": ".", "bzlmodEnabled": false},
+          {"folder": "e2e/smoke", "bzlmodEnabled": false}
+        ]

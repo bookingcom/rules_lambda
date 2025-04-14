@@ -1,7 +1,16 @@
 bazel_dep(name = "com_booking_rules_lambda", version = "0.0.1")
-bazel_dep(name = "bazel_skylib", version = "1.4.1")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
 
 local_path_override(
     module_name = "com_booking_rules_lambda",
     path = "../..",
+)
+
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_file(
+    name = "test_tar_gz",
+    dev_dependency = True,
+    sha256 = "45768f4266fa6b2979213ad75085155b3b63fae89977b7d66e8736044a3c0a50",
+    url = "https://github.com/bazelbuild/bazel-gazelle/archive/4dfcb75883c6ca2441e6ad17173488068adcfb1c.tar.gz",
 )

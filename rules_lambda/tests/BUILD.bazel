@@ -1,4 +1,4 @@
-load("//rules_lambda:defs.bzl", "tar2zip", "update_function_code", "targz2tar")
+load("//rules_lambda:defs.bzl", "tar2zip", "targz2tar", "update_function_code")
 
 targz2tar(
     name = "test_tar",
