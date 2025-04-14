@@ -24,12 +24,11 @@ update_function_code(
     zip_file = ":test_zip",
 )
 
-
 build_test(
     name = "smoke_test",
     targets = [
         ":test_tar",
         ":test_zip",
-        ":update-lambda"
+        ":update-lambda",
     ],
 )
